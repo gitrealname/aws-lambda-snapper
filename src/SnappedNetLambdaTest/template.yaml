@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: maksym-net8
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 2048
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: .
+      Handler: SnappedNetLambdaTest::SnappedNetLambdaTest.Function::FunctionHandler
+      Runtime: dotnet8
+      #Runtime: java21
+      FunctionName: SnappedNetLambdaTest
+      # SnapStart:
+      #   ApplyOn: PublishedVersions
+      Architectures:
+      - x86_64
+      # Memory increse doesn't make it much better. 2 secs (still good, but not prefect :-) restore time is due to post bootstrap logic by lambda core. 
+      #    see HostExtensions.cs for details and mitigation attempts.
+      # MemorySize: 9216
+      MemorySize: 2048
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          FAKE: FAKE
+          # AWS_LAMBDA_EXEC_WRAPPER: /opt/echo_wrapper.sh
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/snapper4net_wrapper.sh
+      AutoPublishAlias: live
+    # see https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html
+    # we need to use makefile to have an ability to switch between runtimes (dotnet8 vs java21) for testing purposes.
+    Metadata:
+      BuildMethod: makefile
+Outputs:
+  HelloWorldFunction:
+    Description: Snapped Test Function ARN
+    Value: !GetAtt SnappedNetLambdaTest.Arn
