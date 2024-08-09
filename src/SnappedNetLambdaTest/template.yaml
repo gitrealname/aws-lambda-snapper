@@ -28,10 +28,10 @@ Resources:
           # AWS_LAMBDA_EXEC_WRAPPER: /opt/snapper4net_wrapper.sh
       AutoPublishAlias: live
     # see https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-custom-runtimes.html
-    # we need to use makefile to have an ability to switch between runtimes (dotnet8 vs java21).
+    # we need to use makefile to have an ability to switch between runtimes (dotnet8 vs java21) for testing purposes.
     Metadata:
       BuildMethod: makefile
 Outputs:
   SnappedNetLambdaTestFunction:
     Description: Snapped Test Function ARN
-    Value: !GetAtt SnappedNetLambdaTest.Arn
+    Value: !GetAtt SnappedNetLambdaTestFunction.Arn
