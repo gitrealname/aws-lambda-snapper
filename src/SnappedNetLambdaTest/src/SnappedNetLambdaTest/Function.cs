@@ -1,16 +1,11 @@
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 
-using Amazon.Lambda.Core;
-
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
 namespace SnappedNetLambdaTest
 {
 
     using System.Text.Json;
-    using Amazon.Lambda.APIGatewayEvents;
-    using Amazon.Lambda.Core;
-    using Snapper.Runtime.Delegator;
 
     public class Function
     {
@@ -34,6 +29,9 @@ namespace SnappedNetLambdaTest
             // {
             //     Console.WriteLine($"FUNCTION: restore point result: {restoredSuccess}");
             // });
+
+            //Restore DNS timeout before snapping; make it 15 mins (max allowed lambda time ever)
+            ServicePointManager.DnsRefreshTimeout = 15 * 60 * 1000;
         }
 
         private static readonly HttpClient client = new HttpClient();

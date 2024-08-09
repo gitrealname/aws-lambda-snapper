@@ -4,6 +4,7 @@
     using Amazon.Lambda.RuntimeSupport;
     using System.Runtime.InteropServices;
     using System.Runtime.Loader;
+    using System.Net;
 
     static class EntryPoint
     {
@@ -52,6 +53,9 @@
             var coreRef = Amazon.Lambda.Core.LogLevel.Critical;
             Nop(coreRef);
 
+            //while bootstrapping, we don't cache DNS resolves
+            ServicePointManager.DnsRefreshTimeout = 0;
+            
             //start runtime
             RuntimeSupportInitializer runtimeSupportInitializer = new RuntimeSupportInitializer(handlerName);
             runtimeSupportInitializer.RunLambdaBootstrap().GetAwaiter().GetResult();
