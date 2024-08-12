@@ -24,9 +24,9 @@ namespace SnappedNetLambdaTest
             _data = new byte[50 * 1024 * 1024];
             Console.WriteLine("--------------------< Bootstrapping is done. >------------------------");
             
-            //The following works, BUT!!!! we loose about 2 seconds during restore, which are needed for CORE 
+            //The following works, BUT!!!! we lose about 1.5 seconds during restore, which are needed for CORE 
             //to get it's bootstrapping fully done.
-            //By other words it takes ~2 seconds from this place to first call to '...runtime/next call!
+            //By other words it takes ~1.5 seconds from this place to first call to '...runtime/next call!
             // Feel free to uncomment to test/see the diff.
             // ((IHost?)null).SnapIt((restoredSuccess) =>
             // {

@@ -39,9 +39,6 @@
 
 using string_t = std::basic_string<char_t>;
 
-
-//#include "bridge2net.h"
-
 // Globals to hold hostfxr exports
 hostfxr_initialize_for_dotnet_command_line_fn init_for_cmd_line_fptr;
 hostfxr_initialize_for_runtime_config_fn init_for_config_fptr;
@@ -85,11 +82,10 @@ std::vector<string_t> split_string(string_t s, string_t delimiter) {
 
 bool call_net(const char* path, const char* dllName, const char* entryType, const char* method);
 
-// parse _NADLER env
+// parse _HANDLER env
 void snapit() {
     string_t _handlerVal = get_env(STR("_HANDLER"));
 	string_t target_location = get_env(STR("NET_RUNTIME_PATH"));
-    //putenv((char*)net_sdk_path.c_str());
 
 	call_net(target_location.c_str(), "Snapper.Runtime.Delegator", "Snapper.Runtime.Delegator.EntryPoint", "StartUnmanagedOnly");
 }

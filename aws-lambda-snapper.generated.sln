@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0EA77A83-2CCF-48B6-B6EE-3ACD20C75049}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Get.Aws.Net.Runtime", "src\get-aws-net-runtime\Get.Aws.Net.Runtime.csproj", "{9F54FD30-1E75-4105-A2B5-D865B2A3D348}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snapper.Runtime.Delegator", "src\Snapper.Runtime.Delegator\Snapper.Runtime.Delegator.csproj", "{4CEE380A-37A6-4347-A493-025355C4ED47}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "helper", "src\snapper4net\helper.csproj", "{6BEA20C7-4D73-4A77-9DEB-357C3D972FD9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SnappedNetLambdaTest", "SnappedNetLambdaTest", "{ACDFC840-08B1-4E91-8347-B57DF370D4DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{60529D80-2FCE-432D-9769-853ED33CFEE7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnappedNetLambdaTest", "src\SnappedNetLambdaTest\src\SnappedNetLambdaTest\SnappedNetLambdaTest.csproj", "{41B3F363-51AD-496D-92FF-F1E972A90EE5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9F54FD30-1E75-4105-A2B5-D865B2A3D348}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F54FD30-1E75-4105-A2B5-D865B2A3D348}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F54FD30-1E75-4105-A2B5-D865B2A3D348}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F54FD30-1E75-4105-A2B5-D865B2A3D348}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CEE380A-37A6-4347-A493-025355C4ED47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CEE380A-37A6-4347-A493-025355C4ED47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CEE380A-37A6-4347-A493-025355C4ED47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CEE380A-37A6-4347-A493-025355C4ED47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BEA20C7-4D73-4A77-9DEB-357C3D972FD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BEA20C7-4D73-4A77-9DEB-357C3D972FD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BEA20C7-4D73-4A77-9DEB-357C3D972FD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BEA20C7-4D73-4A77-9DEB-357C3D972FD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41B3F363-51AD-496D-92FF-F1E972A90EE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41B3F363-51AD-496D-92FF-F1E972A90EE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41B3F363-51AD-496D-92FF-F1E972A90EE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41B3F363-51AD-496D-92FF-F1E972A90EE5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9F54FD30-1E75-4105-A2B5-D865B2A3D348} = {0EA77A83-2CCF-48B6-B6EE-3ACD20C75049}
+		{4CEE380A-37A6-4347-A493-025355C4ED47} = {0EA77A83-2CCF-48B6-B6EE-3ACD20C75049}
+		{6BEA20C7-4D73-4A77-9DEB-357C3D972FD9} = {0EA77A83-2CCF-48B6-B6EE-3ACD20C75049}
+		{ACDFC840-08B1-4E91-8347-B57DF370D4DD} = {0EA77A83-2CCF-48B6-B6EE-3ACD20C75049}
+		{60529D80-2FCE-432D-9769-853ED33CFEE7} = {ACDFC840-08B1-4E91-8347-B57DF370D4DD}
+		{41B3F363-51AD-496D-92FF-F1E972A90EE5} = {60529D80-2FCE-432D-9769-853ED33CFEE7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {969D5F43-BD60-4B8F-B1E0-CB6DD3ABCE27}
+	EndGlobalSection
+EndGlobal

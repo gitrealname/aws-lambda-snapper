@@ -11,7 +11,7 @@
             var apiUrl = Environment.GetEnvironmentVariable("AWS_LAMBDA_RUNTIME_API");
             if (string.IsNullOrWhiteSpace(execEnv) || string.IsNullOrWhiteSpace(apiUrl) || !execEnv.Contains("_java"))
             {
-                Console.WriteLine("JVM-BRIDGE: AWS Execution environment has to to be Java for SnapIt to work.");
+                Console.WriteLine("AWS Execution environment has to be Java for SnapIt to work.");
                 return;
             }
             
@@ -27,10 +27,10 @@
                 var response = client.GetAsync("2018-06-01/runtime/restore/next").GetAwaiter().GetResult();
                 if (!response.IsSuccessStatusCode)
                 {
-                    Console.Error.WriteLine($"JVM-BRIDGE: restore/net has failed. Continue as if nothing happened.");
+                    Console.Error.WriteLine($"Restore/net has failed. Continue as if nothing happened.");
                     success = false;
                 }
-                Console.WriteLine($"JVM-BRIDGE: RESTORED; status: {success}");
+                Console.WriteLine($"RESTORED; status: {success}");
 
                 if(afterRestore != null) {
                     afterRestore(success);
