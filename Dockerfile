@@ -64,5 +64,5 @@ FROM src AS shell
 COPY ./src/scripts/docker_entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker_entrypoint.sh
 WORKDIR ${USER_HOME_DIR}
-#ENTRYPOINT [ "/usr/local/bin/docker_entrypoint.sh" ]
+ENTRYPOINT [ "/usr/local/bin/docker_entrypoint.sh" ]
 CMD ["/bin/bash"]
