@@ -30,7 +30,7 @@ echo "Done."
 #install dotnet (skip if exists)
 echo -e "\n***************** Installing: dotnet *****************"
 if ! [ -f /opt/bin/dotnet ]; then 
-  ${USER_HOME_DIR}/scripts/dotnet-install.sh --runtime dotnet --install-dir /opt/bin --no-path
+  ${USER_HOME_DIR}/scripts/dotnet-install.sh --runtime ${SDK} --install-dir /opt/bin --no-path
 fi
 echo "Done."
 

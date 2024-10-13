@@ -28,6 +28,6 @@ mkdir -p /opt/bin
 mkdir -p /opt/lib
 cp ${SCRIPT_DIR}/target/snapper4net /opt/bin/
 cp ${SCRIPT_DIR}/target/lib* /opt/lib/
-cp ${SCRIPT_DIR}/snapper4net_wrapper.sh /opt
+cp ${SCRIPT_DIR}/snapper4net*.sh /opt
 
 echo "Done."

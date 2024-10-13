@@ -11,8 +11,8 @@ ARG USER_HOME_DIR="/root"
 ARG RUNTIME="net" 
 #8  or 6 (tbi) ... 39 (for python), 20 (for node) (you name it, it is a TBI anyway)
 ARG RUNTIMEVER="8"
-#core or web (tbi), have no idea if it applies to other runtimes 
-ARG SDK="core"
+#aspnetcore or dotnet (aspnetcore includes dotnet), have no idea if it applies to other runtimes 
+ARG SDK="aspnetcore"
 
 #ENV TARGETPLATFORM=$TARGETPLATFORM
 ENV TARGETARCH=$TARGETARCH
