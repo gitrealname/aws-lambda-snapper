@@ -1,4 +1,5 @@
 #!/bin/bash
+# OBSOLETE: There is no need to have Snapper.Runtime.Delegator 
 originalIFS="$IFS"
 
 #test
