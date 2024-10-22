@@ -23,6 +23,15 @@ if [[ $AWS_EXECUTION_ENV != AWS_Lambda_java* ]]; then
   exit 0
 fi
 
+#run export script
+. /opt/snapper4net_export.sh
+
+#deligating to task bootstrap.sh if exists
+if [ -f "${LAMBDA_TASK_ROOT}/bootstrap.sh" ]; then
+  echo "SNAPPER-WRAPPER: executing /bin/bash ${LAMBDA_TASK_ROOT}/bootstrap.sh ${args[@]}..."
+  exec "/bin/bash" "${LAMBDA_TASK_ROOT}/bootstrap.sh" "${args[@]}"
+fi
+
 #detect dotnet framework type lambda depends on
 echo "SNAPPER-WRAPPER: detecting lambda's framework..."
 if [ -f /tmp/sdk_location ]; then

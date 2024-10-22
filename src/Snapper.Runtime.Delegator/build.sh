@@ -20,6 +20,22 @@ if [ -f /opt/bin/dotnet ]; then
     while IFS= read -r dir; do
         cp ${SCRIPT_DIR}/target/Snapper.Runtime.Delegator.* ${dir}/
     done <<< "$rhomes"
+
+    #store runtime homes into snapper4net_export.sh for export as DOTNET_ADDITIONAL_DEPS
+    tmp=()
+    while IFS= read -r dir; do
+            tmp+=($dir)
+    done <<< "$rhomes"    
+    tmp1=$(IFS=":" ; echo "${tmp[*]}")
+
+    echo "export DOTNET_ADDITIONAL_DEPS=${tmp1}"
+
+    echo "export DOTNET_ADDITIONAL_DEPS=${tmp1}" >> /opt/snapper4net_export.sh
+    echo >> /opt/snapper4net_export.sh
+
+    # echo "export DOTNET_ADDITIONAL_DEPS=${tmp1}" >> /root/scripts/snapper4net_export.sh
+    # echo >> /root/scripts/snapper4net_export.sh
+
 fi
 
 echo "Done."

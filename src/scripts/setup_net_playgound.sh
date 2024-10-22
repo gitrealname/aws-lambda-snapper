@@ -36,16 +36,36 @@ echo -e "\n***************** Preparing: PLAYGROUND *****************"
 # Is a part of build.sh now
 # cp -v /root/snapper4net/target/snapper4* /opt/bin/
 
-# TBD
-# pushd ${USER_HOME_DIR}/SnappedNetLambdaTest
-# mkdir -p /var
-# mkdir -p /var/task
-# sam build
-# cp -v <TBD-SAM-ARTIFACT-PATH>/* /var/task/
-# popd
+mkdir -p /var
+mkdir -p /var/task
 
-echo "Done."
+pushd ${USER_HOME_DIR}/SnappedNetLambdaTest
+./build.sh
+popd
+
+pushd ${USER_HOME_DIR}/SnappedAspLambdaTest
+./build.sh
+popd
+
+echo "\n............ exporting env ...................."
 
 #export env for shell use
 export PATH=${PATH}:/opt/net
 export LD_LIBRARY_PATH=/opt/icu
+#will be set by wrapper: export _HANDLER="SnappedNetLambdaTest::SnappedNetLambdaTest.Function::FunctionHandler"
+export AWS_EXECUTION_ENV="AWS_Lambda_java21"
+export LAMBDA_TASK_ROOT="/var/task"
+
+. /opt/snapper4net_export.sh
+
+if ! [[ -v "${LD_LIBRARY_PATH}" ]]; then
+  export LD_LIBRARY_PATH="/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib"
+else 
+  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/var/task/lib:/opt/lib"
+fi
+
+#export SNAPPER_USE_DELEGATOR=true
+
+echo "Done."
+
+

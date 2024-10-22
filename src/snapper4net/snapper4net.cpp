@@ -80,23 +80,49 @@ std::vector<string_t> split_string(string_t s, string_t delimiter) {
     return res;
 }
 
-bool call_net(const char* path, const char* dllName, const char* entryType, const char* method);
+bool call_net(const char* runtime_config, const char* delegator_root,  const char* delegator_dll_name, const char* entryType, const char* method);
 
 // parse _HANDLER env
 void snapit() {
-    string_t _handlerVal = get_env(STR("_HANDLER"));
-	string_t target_location = get_env(STR("NET_RUNTIME_PATH"));
+    string_t _handler_val = get_env(STR("_HANDLER"));
 
-	call_net(target_location.c_str(), "Snapper.Runtime.Delegator", "Snapper.Runtime.Delegator.EntryPoint", "StartUnmanagedOnly");
+	//string_t task_root = get_env(STR("NET_RUNTIME_PATH"));
+    //string_t delegator_dll_name = "Snapper.Runtime.Delegator";
+
+    // string_t _deps = get_env(STR("DOTNET_ADDITIONAL_DEPS"));
+    // std::vector<string_t> _deps_vector = split_string(_deps, ":");
+    // string_t task_root = _deps_vector[0];
+
+    string_t _deps = get_env(STR("DOTNET_ADDITIONAL_DEPS"));
+    std::vector<string_t> _deps_vector = split_string(_deps, ":");
+    string_t delegator_root = _deps_vector[0];
+
+    string_t task_root = get_env(STR("LAMBDA_TASK_ROOT"));
+
+    std::vector<string_t> _handler_vector = split_string(_handler_val, "::");
+    string_t handler_dll_name = _handler_vector[0];
+
+    if (!ends_with(task_root, STR(DIR_SEPARATOR))) {
+        task_root += DIR_SEPARATOR;
+    }
+    const string_t runtime_config = task_root + STR(handler_dll_name + ".runtimeconfig.json");
+
+    std::cout << "task_root: " << task_root << std::endl;
+    std::cout << "delegator_root: " << delegator_root << std::endl;
+    std::cout << "handler_dll_name: " << handler_dll_name << std::endl;
+    std::cout << "runtime_config: " << runtime_config << std::endl;
+
+
+	call_net(runtime_config.c_str(), delegator_root.c_str(), "Snapper.Runtime.Delegator", "Snapper.Runtime.Delegator.EntryPoint", "StartUnmanagedOnly");
 }
 
-bool call_net(const char* path, const char* dllName, const char* entryType, const char* method) {
+bool call_net(const char* runtime_config, const char* delegator_root,  const char* delegator_dll_name, const char* entryType, const char* method) {
     //std::cout << "path: " << path << std::endl;;
     // format path
-    string_t root_path = STR(path);
-    if (!ends_with(path, STR(DIR_SEPARATOR))) {
-        root_path += DIR_SEPARATOR;
-    }
+    // string_t root_path = STR(path);
+    // if (!ends_with(path, STR(DIR_SEPARATOR))) {
+    //     root_path += DIR_SEPARATOR;
+    // }
     //std::cout << "root_path: " << root_path << std::endl;
 
     // Load HostFxr and get exported hosting functions
@@ -106,19 +132,20 @@ bool call_net(const char* path, const char* dllName, const char* entryType, cons
         return EXIT_FAILURE;
     }   
 
-    // Initialize and start the .NET Core runtime
-    const string_t config_path = root_path + STR(dllName + ".runtimeconfig.json");
+    // // Initialize and start the .NET Core runtime
+    // const string_t runtime_config = root_path + STR(delegator_dll_name + ".runtimeconfig.json");
     load_assembly_and_get_function_pointer_fn load_assembly_and_get_function_pointer = nullptr;
-    load_assembly_and_get_function_pointer = get_dotnet_load_assembly(config_path.c_str());
+    load_assembly_and_get_function_pointer = get_dotnet_load_assembly(runtime_config);
     assert(load_assembly_and_get_function_pointer != nullptr && "Failure: get_dotnet_load_assembly()");
 
     // Load managed assembly and get function pointer to a managed method
-    const string_t dotnetlib_path = root_path + STR(dllName + ".dll");
-    //std::cout << "dotnetlib_path: " << dotnetlib_path << std::endl;
+    const string_t tmp = delegator_root;
+    const string_t dotnetlib_path = tmp + STR("/" + delegator_dll_name + ".dll");
+    std::cout << "dotnetlib_path: " << dotnetlib_path << std::endl;
     string_t type_name = STR(entryType);
     type_name += STR(", ");
-    type_name += dllName;
-    //std::cout << "type_name: " << type_name << std::endl;
+    type_name += delegator_dll_name;
+    std::cout << "type_name: " << type_name << std::endl;
     const char_t *dotnet_type = type_name.c_str();
     const char_t *dotnet_type_method = STR(method);
 
@@ -218,12 +245,12 @@ bool load_hostfxr(const char_t *assembly_path)
 
 // <SnippetInitialize>
 // Load and initialize .NET Core and get desired function pointer for scenario
-load_assembly_and_get_function_pointer_fn get_dotnet_load_assembly(const char_t *config_path)
+load_assembly_and_get_function_pointer_fn get_dotnet_load_assembly(const char_t *runtime_config)
 {
     // Load .NET Core
     void *load_assembly_and_get_function_pointer = nullptr;
     hostfxr_handle cxt = nullptr;
-    int rc = init_for_config_fptr(config_path, nullptr, &cxt);
+    int rc = init_for_config_fptr(runtime_config, nullptr, &cxt);
     if (rc != 0 || cxt == nullptr)
     {
         std::cerr << "Init failed: " << std::hex << std::showbase << rc << std::endl;

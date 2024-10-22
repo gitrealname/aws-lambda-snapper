@@ -2,6 +2,7 @@
 
 #prep destination
 mkdir -p ${USER_HOME_DIR}/output
+rm -rf /opt/*
 
 #create dnf jail
 echo -e "\n***************** Preparing: dnf jail *****************"
@@ -44,6 +45,14 @@ echo "Done."
 # done <<< "$rhomes"
 # echo "Done."
 
+#build snapper4net
+#echo -e "\n***************** Installing: snapper4net *****************"
+${USER_HOME_DIR}/snapper4net/build.sh
+#moved to build.sh
+# cp ${USER_HOME_DIR}/snapper4net/target/snapper4net /opt/bin/
+# cp ${USER_HOME_DIR}/snapper4net/target/lib* /opt/lib/
+# echo "Done."
+
 #build Snapper.Runtime.Delegator
 #echo -e "\n***************** Installing: Snapper.Runtime.Delegator *****************"
 ${USER_HOME_DIR}/Snapper.Runtime.Delegator/build.sh
@@ -51,14 +60,6 @@ ${USER_HOME_DIR}/Snapper.Runtime.Delegator/build.sh
 # while IFS= read -r dir; do
 #     cp ${USER_HOME_DIR}/Snapper.Runtime.Delegator/target/Snapper.Runtime.Delegator.* ${dir}/
 # done <<< "$rhomes"
-# echo "Done."
-
-#build snapper4net
-#echo -e "\n***************** Installing: snapper4net *****************"
-${USER_HOME_DIR}/snapper4net/build.sh
-#moved to build.sh
-# cp ${USER_HOME_DIR}/snapper4net/target/snapper4net /opt/bin/
-# cp ${USER_HOME_DIR}/snapper4net/target/lib* /opt/lib/
 # echo "Done."
 
 #build and copy AWS runtime deps
@@ -84,4 +85,5 @@ zip -ru ${USER_HOME_DIR}/output/layer_${RUNTIME}${RUNTIMEVER}_${SDK}_${TARGETOS}
 echo "Done."
 
 #optional for local testing.
-${USER_HOME_DIR}/scripts/setup_net_playgound.sh
+echo -e "\n***************** setup_net_playgound *****************"
+. ${USER_HOME_DIR}/scripts/setup_net_playgound.sh

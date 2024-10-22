@@ -7,7 +7,7 @@ if ! [ -n "${AWS_LAMBDA_RUNTIME_API}" ]; then
   echo "SNAPPER-WRAPPER: TEST MODE"
   AWS_EXECUTION_ENV="AWS_Lambda_java21"
   LAMBDA_TASK_ROOT="/var/task"
-  _HANDLER=SnappedNetLambdaTest::SnappedNetLambdaTest.Function::FunctionHandler
+  _HANDLER=SnappedAspLambdaTest
 fi
 
 #grab args
@@ -21,6 +21,26 @@ if [[ $AWS_EXECUTION_ENV != AWS_Lambda_java* ]]; then
   exec "${args[@]}"
   exit 0
 fi
+
+#run export script
+. /opt/snapper4net_export.sh
+
+#deligating to task bootstrap.sh if exists
+if [ -f "${LAMBDA_TASK_ROOT}/bootstrap.sh" ]; then
+  echo "SNAPPER-WRAPPER: executing /bin/bash ${LAMBDA_TASK_ROOT}/bootstrap.sh ${args[@]}..."
+  exec "/bin/bash" "${LAMBDA_TASK_ROOT}/bootstrap.sh" "${args[@]}"
+fi
+
+#set vars
+#setting env and starting
+export DOTNET_ROOT=/opt/bin
+DOTNET_BIN="${DOTNET_ROOT}/dotnet"
+DOTNET_EXEC="exec"
+DOTNET_ARGS=()
+EXECUTABLE_BINARY_EXIST=false
+LAMBDA_HANDLER="${_HANDLER}"
+HANDLER_COL_INDEX=$(expr index "${LAMBDA_HANDLER}" ":")
+RUNTIME_SUPPORT_DLL="Amazon.Lambda.RuntimeSupport.dll"
 
 #detect dotnet framework type lambda depends on
 echo "SNAPPER-WRAPPER: detecting lambda's framework..."
@@ -58,16 +78,6 @@ else
   #caching for quick access
   echo $loc > /tmp/sdk_location
 fi
-
-#setting env and starting
-export DOTNET_ROOT=/opt/bin
-DOTNET_BIN="${DOTNET_ROOT}/dotnet"
-DOTNET_EXEC="exec"
-DOTNET_ARGS=()
-EXECUTABLE_BINARY_EXIST=false
-LAMBDA_HANDLER="${_HANDLER}"
-HANDLER_COL_INDEX=$(expr index "${LAMBDA_HANDLER}" ":")
-RUNTIME_SUPPORT_DLL="Amazon.Lambda.RuntimeSupport.dll"
 
 if [[ "${HANDLER_COL_INDEX}" == 0 ]]; then 
   EXECUTABLE_ASSEMBLY="${LAMBDA_TASK_ROOT}/${LAMBDA_HANDLER}"
@@ -131,7 +141,7 @@ else
     framework=$(echo $flat_content | sed -nr  's/^.*runtimeOptions.*?framework.*?name.*?(Microsoft[^"]*).*$/\1/p')
     echo "SNAPPER-WRAPPER: lambda framework: ${framework}"
     #run dotnet to extract runtime location
-    rhomes=$(/opt/bin/dotnet --info | sed -nr "s/^.*Microsoft.*App\s([0-9.]+)\s\[(.*)]/\2\/\1/p")
+    rhomes=$( ${DOTNET_BIN} --info | sed -nr "s/^.*Microsoft.*App\s([0-9.]+)\s\[(.*)]/\2\/\1/p")
     while IFS= read -r i; do
       if [[ $i == *"${framework}"* ]]; then
         loc=$i
@@ -147,19 +157,12 @@ else
     echo $loc > /tmp/sdk_location
   fi
   # Build runtime support dll name
-  RUNTIME_SUPPORT_DLL="${$loc}/${RUNTIME_SUPPORT_DLL}"
+  RUNTIME_SUPPORT_DLL="${loc}/${RUNTIME_SUPPORT_DLL}"
   if ! [ -f $RUNTIME_SUPPORT_DLL ]; then
     echo "SNAPPER-WRAPPER: Error: ${RUNTIME_SUPPORT_DLL} not found" 1>&2
     exit 202
   fi
   echo "SNAPPER-WRAPPER: Runtime DLL: ${RUNTIME_SUPPORT_DLL}"
-  # Update LD_LIBRARY_PATH
-  if ! [[ -v "${LD_LIBRARY_PATH}" ]]; then
-    export LD_LIBRARY_PATH="${loc}:/opt/lib:/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib"
-  else 
-    export LD_LIBRARY_PATH="${loc}:${LD_LIBRARY_PATH}"
-  fi
-
 
   # Build Args
   DOTNET_ARGS+=("--depsfile" "${DEPS_FILE}"
@@ -167,10 +170,23 @@ else
                 "${RUNTIME_SUPPORT_DLL}" "${LAMBDA_HANDLER}")
 fi
 
+if ! [[ -v "${LD_LIBRARY_PATH}" ]]; then
+  export LD_LIBRARY_PATH="/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib"
+else 
+  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/var/task/lib:/opt/lib"
+fi
 
 # Start
+if ! [ -z ${SNAPPER_USE_DELEGATOR} ]; then 
+  if [[ ${SNAPPER_USE_DELEGATOR} == "true" ]]; then
+    cmd="/opt/bin/snapper4net"
+    echo "SNAPPER-WRAPPER: Starting Using delegator: (${cmd})..."
+    exec "${cmd}"
+  fi
+fi
+
 if [ ${EXECUTABLE_BINARY_EXIST} = true ]; then
-  echo "SNAPPER-WRAPPER: Starting: ${EXECUTABLE_BINARY}..."
+  echo "SNAPPER-WRAPPER: Starting Binary: ${EXECUTABLE_BINARY}..."
   exec "${EXECUTABLE_BINARY}"
 else
   echo "SNAPPER-WRAPPER: Starting: '${DOTNET_BIN} ${DOTNET_EXEC} ${DOTNET_ARGS[@]}'..."

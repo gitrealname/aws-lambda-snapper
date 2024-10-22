@@ -13,7 +13,7 @@
         private static string LAMBDA_ROOT_ENV = "LAMBDA_TASK_ROOT";
 
         //important: expected to be set by snapper
-        private static string NET_RUNTIME_PATH_ENV = "NET_RUNTIME_PATH";
+        private static string DOTNET_ADDITIONAL_DEPS = "DOTNET_ADDITIONAL_DEPS";
 
         [StructLayout(LayoutKind.Sequential)]
         public struct LibArgs
@@ -21,7 +21,7 @@
         }
 
         private static string? _handlerRoot;
-        private static string? _frameworkRoot;
+        private static string[]? _frameworkRoots;
 
         private static Dictionary<string, Assembly> _assemblyCache = new Dictionary<string, Assembly>();
 
@@ -31,10 +31,11 @@
             var appDomain = AppDomain.CurrentDomain;
             var runtimeAssemblyName = new AssemblyName(AWS_RUNTIME_ASSEMBLY);
             var handlerName = Environment.GetEnvironmentVariable(LAMBDA_HANDLER_ENV);
+            var usingEntryPoint = handlerName?.IndexOf("::") < 0 ? true : false;
 
             //override assembly loading logic
             _handlerRoot = Environment.GetEnvironmentVariable(LAMBDA_ROOT_ENV);
-            _frameworkRoot = Environment.GetEnvironmentVariable(NET_RUNTIME_PATH_ENV);
+            _frameworkRoots = Environment.GetEnvironmentVariable(DOTNET_ADDITIONAL_DEPS).Split(':');
             appDomain.AssemblyResolve += ResolveAssembly;
             appDomain.ReflectionOnlyAssemblyResolve += ResolveAssembly;
 
@@ -49,16 +50,41 @@
                 //Console.WriteLine($"RUNTIME-DELEGATOR: already loaded assembly: {pureName}");
             }
 
-            //insure that Core assembly is loaded and not optimized
+            //ensure that Core assembly is loaded and not optimized
             var coreRef = Amazon.Lambda.Core.LogLevel.Critical;
             Nop(coreRef);
 
             //while bootstrapping, we don't cache DNS resolves
             ServicePointManager.DnsRefreshTimeout = 0;
-            
-            //start runtime
-            RuntimeSupportInitializer runtimeSupportInitializer = new RuntimeSupportInitializer(handlerName);
-            runtimeSupportInitializer.RunLambdaBootstrap().GetAwaiter().GetResult();
+
+            if (usingEntryPoint)
+            {
+                Console.WriteLine($"RUNTIME-DELEGATOR: Starting Using entry point...");
+
+                var handlerAssemblyFile = $"{_handlerRoot}/{handlerName}.dll";
+                Console.WriteLine($"RUNTIME-DELEGATOR: Handler Assembly File: {handlerAssemblyFile}");
+                var a = Assembly.LoadFile(handlerAssemblyFile);
+                var pureName = GetAsseblyPureName(a.FullName ?? "disable-warning");
+                _assemblyCache.Add(pureName, a);
+
+                var methodEntryPoint = a.EntryPoint;
+                if (methodEntryPoint == null)
+                {
+                    Console.WriteLine($"RUNTIME-DELEGATOR: ERROR: Failed to find entry point method in: {handlerName}");
+                    throw new InvalidOperationException(
+                        $"RUNTIME-DELEGATOR: ERROR: Failed to find entry point method in: {handlerName}");
+
+                }
+                //IMPORTANT: it must be of length of at least 1!!! (still don't know why, for some executables 0 length array works as well!
+                methodEntryPoint.Invoke(null, new string[1]);
+            }
+            else
+            {
+                Console.WriteLine($"RUNTIME-DELEGATOR: Starting Using RuntimeSupportInitializer...");
+                //start runtime
+                RuntimeSupportInitializer runtimeSupportInitializer = new RuntimeSupportInitializer(handlerName);
+                runtimeSupportInitializer.RunLambdaBootstrap().GetAwaiter().GetResult();
+            }
         }
 
         private static void Nop(object ignore) {
@@ -80,8 +106,8 @@
                 return ass;
             }
 
-            var fn1 = $"{_frameworkRoot}/{pureName}.dll";
-            var fn2 = $"{_handlerRoot}/{pureName}.dll";
+            var fn1 = $"{_handlerRoot}/{pureName}.dll";
+            var fn2 = $"{_frameworkRoots}/{pureName}.dll";
             
             if (File.Exists(fn1))
             {
@@ -90,17 +116,20 @@
                 //Console.WriteLine($"RUNTIME-DELEGATOR: loaded assembly: {fn1}");
                 return a;
             }
-            else if (File.Exists(fn2)) 
+
+            foreach (var root in _frameworkRoots)
             {
-                var a = Assembly.LoadFile(fn2);
-                _assemblyCache.Add(pureName, a);
-                //Console.WriteLine($"RUNTIME-DELEGATOR: loaded assembly: {fn2}");
-                return a;
+                var fn = $"{root}/{pureName}.dll";
+                if (File.Exists(fn))
+                {
+                    var a = Assembly.LoadFile(fn2);
+                    _assemblyCache.Add(pureName, a);
+                    //Console.WriteLine($"RUNTIME-DELEGATOR: loaded assembly: {fn}");
+                    return a;
+                }
             }
-            else
-            {
-                //Console.Error.WriteLine($"RUNTIME-DELEGATOR: Unable to find assembly: {pureName}; file name: {fn1} nor {fn2} ");
-            }
+            
+            //Console.Error.WriteLine($"RUNTIME-DELEGATOR: Unable to find assembly: {pureName}; file name: {fn1} nor {fn2} ");
             return null;
         }
     }
