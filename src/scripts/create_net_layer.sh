@@ -55,6 +55,9 @@ echo -e "\n***************** Installing/copy: "must have" Utils for 'smart' laye
   ldd /usr/bin/awk | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
   cp -v /usr/bin/awk /opt/bin
 
+  ldd /usr/sbin/sysctl | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
+  cp -v /usr/sbin/sysctl /opt/bin
+
   #remove which will always be given/provided by the host
   rm  -f /opt/lib/ld-linux-x86-64.so.2 /opt/lib/linux-vdso.so.1
 echo "Done."
