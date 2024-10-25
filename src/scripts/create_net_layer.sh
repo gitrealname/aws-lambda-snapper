@@ -35,6 +35,28 @@ if ! [ -f /opt/bin/dotnet ]; then
 fi
 echo "Done."
 
+#install/copying utils that may be need by other "smart" layers/apps
+echo -e "\n***************** Installing/copy: "must have" Utils for 'smart' layers/apps *****************"
+  ldd /usr/bin/unzip | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
+  cp -v /usr/bin/uzip /opt/bin
+
+  ldd /usr/bin/tar | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
+  cp -v /usr/bin/tar /opt/bin
+
+  ldd /usr/bin/cpio | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
+  cp -v /usr/bin/cpio /opt/bin
+
+  ldd /usr/bin/rpm | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
+  cp -v /usr/bin/rpm /opt/bin
+
+  ldd /usr/bin/awk | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
+  cp -v /usr/bin/awk /opt/bin
+
+  #remove which will always be given/provided by the host
+  rm  -f /opt/lib/ld-linux-x86-64.so.2 /opt/lib/linux-vdso.so.1
+echo "Done."
+
+
 #prep for .net builds and publishing
 #get net runtimes location artifacts
 # Moved into Delegator build.sh

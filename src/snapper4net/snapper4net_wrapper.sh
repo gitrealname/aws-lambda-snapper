@@ -25,12 +25,6 @@ fi
 #run export script
 . /opt/snapper4net_export.sh
 
-#deligating to task bootstrap.sh if exists
-if [ -f "${LAMBDA_TASK_ROOT}/bootstrap.sh" ]; then
-  echo "SNAPPER-WRAPPER: executing /bin/bash ${LAMBDA_TASK_ROOT}/bootstrap.sh ${args[@]}..."
-  exec "/bin/bash" "${LAMBDA_TASK_ROOT}/bootstrap.sh" "${args[@]}"
-fi
-
 #set vars
 #setting env and starting
 export DOTNET_ROOT=/opt/bin
@@ -183,6 +177,17 @@ if ! [ -z ${SNAPPER_USE_DELEGATOR} ]; then
     echo "SNAPPER-WRAPPER: Starting Using delegator: (${cmd})..."
     exec "${cmd}"
   fi
+fi
+
+#deligating to task's bootstrap.sh if exists
+if [ -n "${AWS_LAMBDA_RUNTIME_API}" ]; then
+    if [ -f "${LAMBDA_TASK_ROOT}/bootstrap.sh" ]; then
+      echo "SNAPPER-WRAPPER: copying ${LAMBDA_TASK_ROOT}/bootstrap.sh --> /tmp"
+      cp -v ${LAMBDA_TASK_ROOT}/bootstrap.sh /tmp/
+      chmod 777 /tmp/bootstrap.sh
+      echo "SNAPPER-WRAPPER: executing: . /tmp/bootstrap.sh ${args[@]}..."
+      . /tmp/bootstrap.sh ${args[@]}
+    fi
 fi
 
 if [ ${EXECUTABLE_BINARY_EXIST} = true ]; then
