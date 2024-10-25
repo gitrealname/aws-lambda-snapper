@@ -23,7 +23,7 @@ ENV RUNTIMEVER=$RUNTIMEVER
 ENV SDK=$SDK
 #------------------------------------------------
 
-RUN dnf install -y tar gzip zip which unzip vim findutils git wget awscli-2 alternatives
+RUN dnf install -y tar gzip zip which unzip procps-ng vim findutils git wget awscli-2 alternatives
 RUN mkdir -p /opt
 RUN mkdir -p /var
 RUN mkdir -p /var/task
