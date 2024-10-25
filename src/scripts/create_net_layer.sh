@@ -40,6 +40,9 @@ echo -e "\n***************** Installing/copy: "must have" Utils for 'smart' laye
   ldd /usr/bin/unzip | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
   cp -v /usr/bin/unzip /opt/bin
 
+  ldd /usr/bin/gzip | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
+  cp -v /usr/bin/gzip /opt/bin
+
   ldd /usr/bin/tar | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
   cp -v /usr/bin/tar /opt/bin
 
@@ -103,7 +106,7 @@ ${USER_HOME_DIR}/get-aws-net-runtime/build.sh
 echo -e "\n***************** Creating: layer *****************"
 cd  /opt
 cp -v ${USER_HOME_DIR}/layer_scripts/* /opt/
-zip -ru ${USER_HOME_DIR}/output/layer_${RUNTIME}${RUNTIMEVER}_${SDK}_${TARGETOS}_${TARGETARCH}.zip *
+zip -ru ${USER_HOME_DIR}/output/snapper_layer_${RUNTIME}${RUNTIMEVER}_${SDK}_${TARGETOS}_${TARGETARCH}.zip *
 echo "Done."
 
 #optional for local testing.

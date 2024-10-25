@@ -1,6 +1,8 @@
 #!/bin/bash
 originalIFS="$IFS"
 
+#NOTE: Clean up is pending. As lots of logic here is obsolete and is not needed anymore (having that we don't use Runtime delegator anymore and use dotnet directly)
+
 #test
 echo 
 if ! [ -n "${AWS_LAMBDA_RUNTIME_API}" ]; then
@@ -179,7 +181,7 @@ if ! [ -z ${SNAPPER_USE_DELEGATOR} ]; then
   fi
 fi
 
-#deligating to task's bootstrap.sh if exists
+#delegating to task's bootstrap.sh if exists
 if [ -n "${AWS_LAMBDA_RUNTIME_API}" ]; then
     if [ -f "${LAMBDA_TASK_ROOT}/bootstrap.sh" ]; then
       echo "SNAPPER-WRAPPER: copying ${LAMBDA_TASK_ROOT}/bootstrap.sh --> /tmp"
