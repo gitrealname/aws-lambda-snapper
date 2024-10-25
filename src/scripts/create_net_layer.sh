@@ -38,7 +38,7 @@ echo "Done."
 #install/copying utils that may be need by other "smart" layers/apps
 echo -e "\n***************** Installing/copy: "must have" Utils for 'smart' layers/apps *****************"
   ldd /usr/bin/unzip | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
-  cp -v /usr/bin/uzip /opt/bin
+  cp -v /usr/bin/unzip /opt/bin
 
   ldd /usr/bin/tar | awk 'NF == 4 { system("cp " $3 " /opt/lib/") }'
   cp -v /usr/bin/tar /opt/bin
